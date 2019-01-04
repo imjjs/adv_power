@@ -19,10 +19,10 @@ if __name__ == '__main__':
     exp = model.Experiment(ins)
     raw_predictions = exp.predict_test()
     predictions = [x[0] for x in raw_predictions]
-    K.set_learning_phase(0)
-    X_advs = exp.attack(-1)
+    #K.set_learning_phase(0)
+    X_advs = exp.attack()
     X_advs = numpy.reshape(X_advs, (207, 24, 1))
-    print(X_advs)
+    exp.set_testing_dropout(.3)
     raw_adv_predictions = exp.predict(X_advs)
     adv_predictions = [x[0] for x in raw_adv_predictions]
     ret = deviation(predictions, adv_predictions)

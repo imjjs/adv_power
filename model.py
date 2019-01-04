@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
-from keras.models import Sequential, model_from_yaml
-from keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
+from keras.models import Sequential, model_from_yaml, Model
+from keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D, Lambda
 import loader
 from keras import backend as K
 from keras import metrics
@@ -32,6 +32,21 @@ class Experiment(object):
             self.train(True)
         self.grad = K.gradients(self.model.output, self.model.input)
 
+    def set_testing_dropout(self, rate):
+        # Store the fully connected layers
+        layerbefore = self.model.layers[-2]
+        predictions = self.model.layers[-1]
+
+        # Create the dropout layers
+        testing_dropout = Lambda(lambda x: K.dropout(x, level=rate))
+
+        # Reconnect the layers
+        x = testing_dropout(layerbefore.output)
+        predictors = predictions(x)
+
+        # Create a new model
+        self.model = Model(input=self.model.input, output=predictors)
+
     def build_model(self):
         model = Sequential()
         model.add(Conv1D(self.feature_dim, 3, activation='relu', input_shape=(self.feature_dim, 1)))
@@ -40,7 +55,8 @@ class Experiment(object):
         model.add(Conv1D(self.feature_dim * 2, 3, activation='relu'))
         model.add(Conv1D(self.feature_dim * 2, 3, activation='relu'))
         model.add(GlobalAveragePooling1D())
-        model.add(Dropout(0.5))
+        model.add(Dense(self.feature_dim * 7, activation='relu'))
+        model.add(Dropout(0.3))
         model.add(Dense(1, activation='linear'))
 
         model.compile(loss='mse',  # mse = MSE = mean_squared_error
