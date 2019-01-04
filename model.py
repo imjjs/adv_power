@@ -5,10 +5,15 @@ import matplotlib.pyplot as plt
 from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential, model_from_yaml
+from keras.models import load_model
 from keras.layers import Conv1D, GlobalAveragePooling1D, MaxPooling1D
 import loader
 from keras import backend as K
 from keras import metrics
+
+from keras.models import Model
+from keras.layers.core import Lambda
+
 
 
 class Experiment(object):
@@ -47,6 +52,23 @@ class Experiment(object):
                       optimizer='rmsprop',
                       metrics=['accuracy'])
         self.model = model
+    
+    def add_dropout(self,rate):
+        # Store the fully connected layers
+        layerbefore = self.model.layers[-3]
+        predictions = self.model.layers[-1]
+        
+        # Create the dropout layers
+        
+        dropout1 = (Lambda(lambda x: K.dropout(x, level=rate)))
+        
+        # Reconnect the layers
+        x = dropout1(layerbefore.output)
+        predictors = predictions(x)
+        
+        # Create a new model
+        self.model = Model(input=self.model.input, output=predictors)
+
 
     def train(self, save=True):
         inp = self.instances
@@ -78,11 +100,13 @@ class Experiment(object):
     def attack(self, reverse=1):
         step_length = 0.005
         steps = 100
-        ret = []
-        for idx in range(len(self.instances.y_test)):
-            X = self.instances.X_test[idx]
-            adv = self.multiple_IterativeGSM([X], step_length, steps, reverse)[0]
-            ret.append(adv)
+        ret = self.multiple_IterativeGSM(self.instances.X_test, step_length, steps, reverse)
+#        ret = []
+        
+#        for idx in range(len(self.instances.y_test)):
+#            X = self.instances.X_test[idx]
+#            adv = self.multiple_IterativeGSM([X], step_length, steps, reverse)[0]
+#            ret.append(adv)
         return ret
 
     def multiple_IterativeGSM(self, X_tst, step_length, steps, reverse):
