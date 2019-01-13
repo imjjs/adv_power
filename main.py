@@ -50,8 +50,8 @@ def trainsform(original_test_x):
     ratio = .1
     z = numpy.zeros(original_test_x.shape)
     tmp = numpy.random.randint(100, size=original_test_x.shape)
-    indx = numpy.where(tmp < 100 * ratio, original_test_x, z)
-    return indx
+    ret = numpy.where(tmp < 100 * ratio, original_test_x, z)
+    return ret
 
 if __name__ == '__main__':
     dataobj = powerData.deepforge4.getPowerData.GetPowerData()
@@ -59,14 +59,14 @@ if __name__ == '__main__':
     print(data[3].shape)
     _, _, test_x, test_y = data
     model = load_model('powerData/lstm150fc500.h5')
-    #model.summary()
-    res_model = set_testing_dropout(model, .1)
+    # model.summary()
+    # res_model = set_testing_dropout(model, .1)
     grad = K.gradients(model.output, model.input)
     adv_test_x = multiple_IterativeGSM(model, test_x, .001, 100, 1, grad)
     result = model.predict(test_x)
     adv_result = model.predict(adv_test_x)
     adv_res_test_x = trainsform(adv_test_x)
-    adv_res_result = res_model.predict(adv_res_test_x)
+    adv_res_result = model.predict(adv_res_test_x)
     rd = deviation(test_y, result)
     adv_rd = deviation(test_y, adv_result)
     adv_res_rd = deviation(test_y, adv_res_result)
