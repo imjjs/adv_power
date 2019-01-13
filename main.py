@@ -46,14 +46,23 @@ def set_testing_dropout(model, rate):
     return new_model
 
 
+import numpy as np
 def trainsform(original_test_x):
+#    mu = original_test_x.mean()
+#    sigma = original_test_x.std()
+    
     ratio = .1
     ret = original_test_x.copy()
     for i in range(len(original_test_x)):
         for j in range(len(original_test_x[0])):
             tmp = numpy.random.randint(0, 100)
             if tmp < 100 * ratio:
-                ret[i][j] = 0
+                ret[i][j] = ret[i][j].mean()
+#                if ret[i][j].mean()< mu:
+#                    ret[i][j] = mu+ sigma
+#                else:
+#                    ret[i][j] = mu- sigma
+    np.clip(ret,0,1)
     # z = numpy.zeros(original_test_x.shape)
     # tmp = numpy.random.randint(0, 100, size=original_test_x.shape)
     # ret = numpy.where(tmp < 100 * ratio, original_test_x, z)
