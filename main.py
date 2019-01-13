@@ -47,10 +47,16 @@ def set_testing_dropout(model, rate):
 
 
 def trainsform(original_test_x):
-    ratio = .1
-    z = numpy.zeros(original_test_x.shape)
-    tmp = numpy.random.randint(100, size=original_test_x.shape)
-    ret = numpy.where(tmp < 100 * ratio, original_test_x, z)
+    ratio = .01
+    ret = original_test_x.copy()
+    for i in range(len(original_test_x)):
+        for j in range(len(original_test_x[0])):
+            tmp = numpy.random.randint(0, 100)
+            if tmp < 100 * ratio:
+                ret[i][j] = 0
+    # z = numpy.zeros(original_test_x.shape)
+    # tmp = numpy.random.randint(0, 100, size=original_test_x.shape)
+    # ret = numpy.where(tmp < 100 * ratio, original_test_x, z)
     return ret
 
 if __name__ == '__main__':
@@ -62,23 +68,28 @@ if __name__ == '__main__':
     # model.summary()
     # res_model = set_testing_dropout(model, .1)
     grad = K.gradients(model.output, model.input)
-    adv_test_x = multiple_IterativeGSM(model, test_x, .001, 100, 1, grad)
+    adv_test_x = multiple_IterativeGSM(model, test_x, .0001, 100, 1, grad)
     result = model.predict(test_x)
     adv_result = model.predict(adv_test_x)
     adv_res_test_x = trainsform(adv_test_x)
     adv_res_result = model.predict(adv_res_test_x)
+    res_test_x = trainsform(test_x)
+    res_result = model.predict(res_test_x)
     rd = deviation(test_y, result)
     adv_rd = deviation(test_y, adv_result)
     adv_res_rd = deviation(test_y, adv_res_result)
+    res_rd = deviation(test_y, res_result)
     mse = mean_squared_error(test_y, result)
     adv_mse  = mean_squared_error(test_y, adv_result)
     adv_res_mse = mean_squared_error(test_y, adv_res_result)
-    print(mse, adv_mse, adv_res_mse)
+    res_mse = mean_squared_error(test_y, res_result)
+    print(mse, adv_mse, adv_res_mse, res_mse)
     print(sum(rd)/len(rd))
     print(sum(adv_rd) / len(adv_rd))
     print(sum(adv_res_rd) / len(adv_res_rd))
-
-
+    print(sum(res_rd)/ len(res_rd))
+    # for idx in range(len(res_rd)):
+    #     print(result[idx], adv_result[idx], res_result[idx])
 
 
     # exp = model.Experiment(ins)
