@@ -47,7 +47,7 @@ def set_testing_dropout(model, rate):
 
 
 def trainsform(original_test_x):
-    ratio = .01
+    ratio = .1
     ret = original_test_x.copy()
     for i in range(len(original_test_x)):
         for j in range(len(original_test_x[0])):
@@ -57,6 +57,7 @@ def trainsform(original_test_x):
     # z = numpy.zeros(original_test_x.shape)
     # tmp = numpy.random.randint(0, 100, size=original_test_x.shape)
     # ret = numpy.where(tmp < 100 * ratio, original_test_x, z)
+    # ret = ret / (1-ratio)
     return ret
 
 if __name__ == '__main__':
@@ -68,7 +69,7 @@ if __name__ == '__main__':
     # model.summary()
     # res_model = set_testing_dropout(model, .1)
     grad = K.gradients(model.output, model.input)
-    adv_test_x = multiple_IterativeGSM(model, test_x, .0001, 100, 1, grad)
+    adv_test_x = multiple_IterativeGSM(model, test_x, .0002, 100, 1, grad)
     result = model.predict(test_x)
     adv_result = model.predict(adv_test_x)
     adv_res_test_x = trainsform(adv_test_x)
