@@ -1,0 +1,63 @@
+             multiple_IterativeGSM(model, X_tst, step_length, steps, reverse, grad)
+adv_test_x = multiple_IterativeGSM(model, test_X, .0001,      100,    1     , grad)
+The MSE max on the test data set is 0.344 over 216 test samples.
+
+The MSE mean on the test data set is 0.162 over 216 test samples.
+
+The MSE sort on the test data set is 0.159 over 216 test samples.
+
+The MSE max on the adv data set is 0.713 over 216 test samples.
+
+The MSE mean on the adv data set is 0.267 over 216 test samples.
+
+The MSE sort on the adv data set is 0.292 over 216 test samples.
+
+
+adv_test_x = multiple_IterativeGSM(model, test_X, .0002, 100, 1, grad)
+0.2115054058748409 0.42011431693325685 0.5352314622354051 0.25447538737956926
+0.21440488779819694 0.5514845813561698 0.5144936718409918 0.32797100894882586
+    # mse: orignal model,  original data 
+    # adv_mse: original model, adv data
+    # adv_res_mse: rand + adv data
+    # res_mse: rand data
+The MSE max on the test data set is 0.326 over 216 test samples.
+
+The MSE mean on the test data set is 0.140 over 216 test samples.
+
+The MSE sort on the test data set is 0.152 over 216 test samples.
+
+The MSE max on the adv data set is 1.177 over 216 test samples.
+
+The MSE mean on the adv data set is 0.523 over 216 test samples.
+
+The MSE sort on the adv data set is 0.515 over 216 test samples.
+----------------------------------------------------------
+The MSE max on the test data set is 0.298 over 216 test samples.
+
+The MSE min on the adv data set is 0.230 over 216 test samples.
+
+The MSE mean on the test data set is 0.161 over 216 test samples.
+
+The MSE sort on the test data set is 0.175 over 216 test samples.
+
+The MSE max on the adv data set is 0.390 over 216 test samples.
+
+The MSE min on the adv data set is 0.278 over 216 test samples.
+
+The MSE mean on the adv data set is 0.194 over 216 test samples.
+
+The MSE sort on the adv data set is 0.216 over 216 test samples.
+
+
+adv_test_x = multiple_IterativeGSM(model, test_X, .00001,      100,    1     , grad)
+The MSE max on the test data set is 0.318 over 216 test samples.
+
+The MSE mean on the test data set is 0.156 over 216 test samples.
+
+The MSE sort on the test data set is 0.180 over 216 test samples.
+
+The MSE max on the adv data set is 0.425 over 216 test samples.
+
+The MSE mean on the adv data set is 0.173 over 216 test samples.
+
+The MSE sort on the adv data set is 0.173 over 216 test samples.
