@@ -40,8 +40,11 @@ if __name__ == '__main__':
     from multiprocessing import Pool
     import l_0
     import l_inf
-    l0_warp = lambda t: l_0.l0_attack(model, t, -1, grad, [q * 50 for q in range(1, 40, 2)])
-    l_inf_warp = lambda t: l_inf.l_inf_attack(model, t, 1e-4, -1, grad, [10*q for q in range(1, 200, 2)])
+
+    def l0_warp(t): return l_0.l0_attack(model, t, -1, grad, [q * 50 for q in range(1, 40, 2)])
+    
+    def l_inf_warp(t): return l_inf.l_inf_attack(model, t, 1e-4, -1, grad, [10*q for q in range(1, 200, 2)])
+
     with Pool(16) as p:
         l_0_ret = p.map(l0_warp, test_x_list)
         l_inf_ret = p.map(l_inf_warp, test_x_list)
