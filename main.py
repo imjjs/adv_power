@@ -32,46 +32,22 @@ if __name__ == '__main__':
     data = dataobj.execute()
     print(data[3].shape)
     _, _, test_x, test_y = data
+    test_x_list = [test_x[idx] for idx in range(len(test_x))]
     model = load_model('powerData/lstm150fc500.h5')
     # model.summary()
     # res_model = set_testing_dropout(model, .1)
     grad = K.gradients(model.output, model.input)
-    thrs = [.1, .15, .2]
-    for thr in thrs:
+    from multiprocessing import Pool
+    import l_0
+    import l_inf
+    l0_warp = lambda t: l_0.l0_attack(model, t, -1, grad, [q * 50 for q in range(1, 40, 2)])
+    l_inf_warp = lambda t: l_inf.l_inf_attack(model, t, 1e-4, -1, grad, [10*q for q in range(1, 200, 2)])
+    with Pool(16) as p:
+        l_0_ret = p.map(l0_warp, test_x_list)
+        l_inf_ret = p.map(l_inf_warp, test_x_list)
 
-        with open('min_{pc}%_l0.pk'.format(pc=str(thr*100)), 'wb') as pk:
-            pickle.dump(adv_test_x, pk)
-    # result = model.predict(test_x)
-    # adv_result = model.predict(adv_test_x)
-    # adv_res_test_x = trainsform(adv_test_x)
-    # adv_res_result = model.predict(adv_res_test_x)
-    # res_test_x = trainsform(test_x)
-    # res_result = model.predict(res_test_x)
-    # rd = deviation(test_y, result)
-    # adv_rd = deviation(test_y, adv_result)
-    # adv_res_rd = deviation(test_y, adv_res_result)
-    # res_rd = deviation(test_y, res_result)
-    # mse = mean_squared_error(test_y, result)
-    # adv_mse  = mean_squared_error(test_y, adv_result)
-    # adv_res_mse = mean_squared_error(test_y, adv_res_result)
-    # res_mse = mean_squared_error(test_y, res_result)
-    # print(mse, adv_mse, adv_res_mse, res_mse)
-    # print(sum(rd)/len(rd))
-    # print(sum(adv_rd) / len(adv_rd))
-    # print(sum(adv_res_rd) / len(adv_res_rd))
-    # print(sum(res_rd)/ len(res_rd))
-    # for idx in range(len(res_rd)):
-    #     print(result[idx], adv_result[idx], res_result[idx])
+    with open('l0.pk', 'wb') as pk:
+        pickle.dump(l_0_ret, pk)
 
-
-    # exp = model.Experiment(ins)
-    # raw_predictions = exp.predict_test()
-    # predictions = [x[0] for x in raw_predictions]
-    # #K.set_learning_phase(0)
-    # X_advs = exp.attack()
-    # X_advs = numpy.reshape(X_advs, (207, 24, 1))
-    # exp.set_testing_dropout(.3)
-    # raw_adv_predictions = exp.predict(X_advs)
-    # adv_predictions = [x[0] for x in raw_adv_predictions]
-    # ret = deviation(predictions, adv_predictions)
-    # print(sum(ret)/len(ret))
+    with open('linf.pk', 'wb') as pk:
+        pickle.dump(l_inf_ret, pk)
